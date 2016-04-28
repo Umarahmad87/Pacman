@@ -90,13 +90,13 @@ void DrawPacMan(float sx/*center x*/, float sy/*center y*/,
 		glVertex4f(sx + pmvertices[i][0], sy + pmvertices[i][1], 0, 1);
 	glEnd();
 	DrawCircle(sx - radius + radius / 2, sy + (radius - radius / 2),
-			radius / 10, colors[BLACK]);
+			radius / 20, colors[BLACK]);
 }
 /*
  * Main Canvas drawing function.
  * */
 Board *b;
-Pacman *pac=new Pacman [5];
+Board **pac=new Board *[5];
 void Display()/**/{
 	// set the background color using function glClearColor.
 	// to change the background play with the red, green and blue values below.
@@ -112,13 +112,13 @@ void Display()/**/{
 	float Px,Py,x1,y1;
 	b->GetInitPinkyPosition(x, y);
 	DrawGhost(x, y, PINK, 2 * b->GetCellSize(), 2 * b->GetCellSize());
-	pac[0].GetPixel(Px,Py);
-	pac[0].GetCell(x1,y1);
+	pac[0]->GetPixel(Px,Py);
+	pac[0]->GetCell(x1,y1);
 	DrawPacMan(Px + 20 - 9, Py +20 - 8, 16, YELLOW);
-	cout<<"x_pixel = "<<pac[0].getX()<<" y_pixel= "<<pac[0].getY()<<endl;
-	x = pac[0].GetMidX();
+	cout<<"x_pixel = "<<pac[0]->getX()<<" y_pixel= "<<pac[0]->getY()<<endl;
+	x = pac[0]->GetMidX();
 	DrawString(280/14, 680, "Score = 000", colors[5]);
-	pac[0].RemovePebbles();
+	pac[0]->RemovePebbles();
 //	glPopMatrix();
 	glutSwapBuffers(); // do not modify this line..
 }
@@ -135,20 +135,20 @@ void Display()/**/{
 
 void NonPrintableKeys(int key, int x, int y) {
 	if (key == GLUT_KEY_LEFT /*GLUT_KEY_LEFT is constant and contains ASCII for left arrow key*/) {
-		pac[0].movement = 1;
+		pac[0]->movement = 1;
 		//pac[0].Xmm();
 	} else if (key == GLUT_KEY_RIGHT /*GLUT_KEY_RIGHT is constant and contains ASCII for right arrow key*/) {
-		pac[0].movement = 2;
+		pac[0]->movement = 2;
 
 		//pac[0].Xpp();
 	}
 	else if (key == GLUT_KEY_UP/*GLUT_KEY_UP is constant and contains ASCII for up arrow key*/) {
-		pac[0].movement = 3;
+		pac[0]->movement = 3;
 		//pac[0].Ypp();
 	}
 
 	else if (key == GLUT_KEY_DOWN/*GLUT_KEY_DOWN is constant and contains ASCII for down arrow key*/) {
-		pac[0].movement = 4;
+		pac[0]->movement = 4;
 		//pac[0].Ymm();
 	}
 
@@ -179,21 +179,21 @@ void PrintableKeys(unsigned char key, int x, int y) {
 void Timer(int m) {
 
 // implement your functionality here
-	if(pac[0].movement==1){
+	if(pac[0]->movement==1){
 
-	pac[0].Xmm();
+	pac[0]->Xmm();
 	cout<<"Movement = Left "<<endl;
 	}
-	if(pac[0].movement==2){
-	pac[0].Xpp();
+	if(pac[0]->movement==2){
+	pac[0]->Xpp();
 	cout<<"Movement = Right "<<endl;
 	}
-	if(pac[0].movement==3){
-	pac[0].Ypp();
+	if(pac[0]->movement==3){
+	pac[0]->Ypp();
 	cout<<"Movement = Up "<<endl;
 	}
-	if(pac[0].movement==4){
-	pac[0].Ymm();
+	if(pac[0]->movement==4){
+	pac[0]->Ymm();
 	cout<<"Movement = Down "<<endl;}
 // once again we tell the library to call our Timer function after next 1000/FPS
 	glutTimerFunc(1000.0 / FPS, Timer, 0);
@@ -204,15 +204,14 @@ void Timer(int m) {
  * our gateway main function
  * */
 int main(int argc, char*argv[]) {
-
-	b=new Board(20, 20); // create a new board object to use in the Display Function ...
-
-	int width = 560, height = 720; // i have set my window size to be 570 x 750
+	b=new Board; // create a new board object to use in the Display Function ...
+	pac[0]=new Pacman;
+	int width = 560, height = 720; // i have set my window size to be 560 x 720
 	InitRandomizer(); // seed the random number generator...
 	glutInit(&argc, argv); // initialize the graphics library...
 
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA); // we will be using color display mode
-	glutInitWindowPosition(500, 500); // set the initial position of our window
+	glutInitWindowPosition(500, 50); // set the initial position of our window
 	glutInitWindowSize(width, height); // set the size of our window
 	glutCreateWindow("CP's Pacman"); // set the title of our game window
 	SetCanvasSize(width, height); // set the number of pixels...

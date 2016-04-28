@@ -84,8 +84,19 @@ static int board_array[Board::BOARD_X][Board::BOARD_Y] = {
 		{ BTRC, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB,BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, BTLC },
 		{ 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0 },
 		{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
+void Board::RemovePebbles(){
+		cout<<"Board::Pebbles"<<endl;
+	}
+void Pacman::RemovePebbles(){
+	cout<<"Pacman::Pebbles"<<endl;
+		int x,y;
+		x=x_cell;
+		y=y_cell;
+	if(board_array[35-y][x]==PEBB)
+		board_array[35-y][x]=0;
+	}
 
-void Pacman::Xpp(){
+void Board::Xpp(){
 
 		//x_cell += 1;
 	int x,y;
@@ -93,22 +104,22 @@ void Pacman::Xpp(){
 	y=y_cell;
 	cout<<" Board = "<<board_array[35-y][x+1]<<endl;
 	if(board_array[35-y][x+1]==PEBB or board_array[35-y][x+1]==0 or board_array[35-y][x+1]==SB or board_array[35-y][x+1]==VE ){
-		x_axis += 1;
+		x_axis += 5;
 		x_cell = x_axis/20.0;}
 		//y_cell = y_axis/20.0;
 }
-void Pacman::Xmm(){
+void Board::Xmm(){
 	//	x_cell -= 1;
 	int x,y;
 	x=ceil(x_cell);
 	y=y_cell;
 	cout<<" Board = "<<board_array[35-y][x-1]<<endl;
 	if(board_array[35-y][x-1]==PEBB or board_array[35-y][x-1]==0 or board_array[35-y][x-1]==SB or board_array[35-y][x-1]==VE ){
-		x_axis -= 1;
+		x_axis -= 5;
 		x_cell = x_axis / 20.0;	}
 		//y_cell = y_axis/20.0;
 }
-void Pacman::Ypp(){
+void Board::Ypp(){
 	//	y_cell += 1;
 	int x,y;
 	x=x_cell;
@@ -118,7 +129,7 @@ void Pacman::Ypp(){
 		y_axis += 5;
 		y_cell = y_axis/20;}
 		}
-void Pacman::Ymm(){
+void Board::Ymm(){
 		int x,y;
 		x=x_cell;
 		y=ceil(y_cell);
@@ -127,13 +138,7 @@ void Pacman::Ymm(){
 		y_axis -= 5;
 		y_cell = y_axis/20;}
 		}
-void Pacman::RemovePebbles(){
-	int x,y;
-	x=x_cell;
-	y=y_cell;
-if(board_array[35-y][x]==PEBB)
-	board_array[35-y][x]=0;
-}
+
 /*bool Pacman::CheckWalls() {
 	int x,y;
 	x=x_cell;
@@ -143,8 +148,7 @@ if(board_array[35-y][x]==PEBB)
 	return false;
 }*/
 // Destructor
-Board::~Board(void) {
-}
+Board::~Board(void) {}
 
 //Constructor
 Board::Board(int xsize, int ysize) {
@@ -156,6 +160,12 @@ Board::Board(int xsize, int ysize) {
 	bcolor = DARK_BLUE;
 	gcolor = PINK;
 //set up board
+
+	movement  =  1;
+		x_cell=13;
+		y_cell=9;
+		x_axis=x_cell*20.0; /*280*/
+		y_axis=y_cell*20.0;
 }
 
 void Board::Draw(void) {
