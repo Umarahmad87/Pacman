@@ -92,10 +92,14 @@ void Pacman::RemovePebbles(){
 		int x,y;
 		x=x_cell;
 		y=y_cell;
-	if(board_array[35-y][x]==PEBB)
+	if(board_array[35-y][x]==PEBB){
 		board_array[35-y][x]=0;
+		Score(10);
 	}
-
+	}
+void Pacman::Draw(){
+	//DrawPacMan(Px + 20 - 9, Py +20 - 8, 16, YELLOW);
+}
 void Board::Xpp(){
 
 		//x_cell += 1;
@@ -105,7 +109,7 @@ void Board::Xpp(){
 	cout<<" Board = "<<board_array[35-y][x+1]<<endl;
 	if(board_array[35-y][x+1]==PEBB or board_array[35-y][x+1]==0 or board_array[35-y][x+1]==SB or board_array[35-y][x+1]==VE ){
 		x_axis += 5;
-		x_cell = x_axis/20.0;}
+		x_cell = x_axis/xcellsize;}
 		//y_cell = y_axis/20.0;
 }
 void Board::Xmm(){
@@ -116,7 +120,7 @@ void Board::Xmm(){
 	cout<<" Board = "<<board_array[35-y][x-1]<<endl;
 	if(board_array[35-y][x-1]==PEBB or board_array[35-y][x-1]==0 or board_array[35-y][x-1]==SB or board_array[35-y][x-1]==VE ){
 		x_axis -= 5;
-		x_cell = x_axis / 20.0;	}
+		x_cell = x_axis / xcellsize;	}
 		//y_cell = y_axis/20.0;
 }
 void Board::Ypp(){
@@ -127,7 +131,7 @@ void Board::Ypp(){
 	cout<<" Board = "<<board_array[35-y-1][x]<<endl;
 	if(board_array[35-y-1][x]==PEBB or board_array[35-y-1][x]==0 or board_array[35-y-1][x]==SB or board_array[35-y-1][x]==VE ){
 		y_axis += 5;
-		y_cell = y_axis/20;}
+		y_cell = y_axis/ycellsize;}
 		}
 void Board::Ymm(){
 		int x,y;
@@ -136,38 +140,68 @@ void Board::Ymm(){
 		cout<<" Board = "<<board_array[35-y+1][x]<<endl;
 		if(board_array[35-y+1][x]==PEBB or board_array[35-y+1][x]==0 or board_array[35-y+1][x]==SB or board_array[35-y+1][x]==VE){
 		y_axis -= 5;
-		y_cell = y_axis/20;}
+		y_cell = y_axis/ycellsize;}
 		}
-
-/*bool Pacman::CheckWalls() {
-	int x,y;
-	x=x_cell;
-	y=y_cell;
-	if(board_array[35-y][x]==PEBB or board_array[35-y][x]==0 or board_array[35-y][x]==SB )
-		return true;
-	return false;
-}*/
+string Board::Score(){ return NULL;}
+string Pacman::Score(){
+	int i=0,A[10],count=0;
+	int n=score;
+	while(n!=0)
+			{A[i]=n%10;
+			n=n/10;
+			count=count+1;
+			i++;}
+		char C[count];
+		int p=0;
+		for(int u=count-1;u>=0;u--)
+			{C[p]=char(A[u]+48);
+			p=p+1;
+			}
+		for(int j=0;j<count;j++)
+			cout<<C[j];
+		string s1;
+		s1=C;
+		cout<<endl<<s1;
+		return s1;}
+void Board::Score(int n){}
+void Pacman::Score(int n){ score+=n;}
+int Board::Radius(){ return 20;}
+int Pacman::Radius(){ return radius;}
+void Board::Reset(){}
+void Pacman::Reset(){
+	x_cell=13;
+	y_cell=9;
+	x_axis=x_cell*xcellsize;
+	y_axis=y_cell*ycellsize;
+	movement=0;
+}
 // Destructor
 Board::~Board(void) {}
 
 //Constructor
-Board::Board(int xsize, int ysize) {
-	xcellsize = xsize;
-	ycellsize = ysize;
+Board::Board(int x_i, int y_i) {
+	xcellsize = 20;
+	ycellsize = 20;
 	lwidth = 3; // line width
 	cwidth = 3; // curve widh
 	pcolor = CHOCOLATE;
-	bcolor = DARK_BLUE;
+	bcolor =  DARK_BLUE;
 	gcolor = PINK;
+	Mov=0;
 //set up board
 
 	movement  =  1;
-		x_cell=13;
-		y_cell=9;
-		x_axis=x_cell*20.0; /*280*/
-		y_axis=y_cell*20.0;
+		x_cell=x_i;
+		y_cell=y_i;
+		x_axis=x_cell*xcellsize; /*280*/
+		y_axis=y_cell*ycellsize;
 }
+Pacman::Pacman(int x_pos, int y_pos):Board(x_pos,y_pos)
+{		radius=16;
+		/*192*/
+		score=0;
 
+}
 void Board::Draw(void) {
 	glColor3f(0, 0, 1);
 	glPushMatrix();

@@ -14,6 +14,7 @@ using namespace std;
 
 
 
+
 class Board {
 protected:
 	int pebbles_left;
@@ -28,17 +29,21 @@ protected:
 		float y_axis;
 		float x_cell;
 		float y_cell;
+		int Mov;
 public:
 	int movement;
+
 	static const int BOARD_X;
 	static const int BOARD_Y;
 	Board(int xsize =20 , int ysize= 20 );
 
 	virtual ~Board(void);
-
+	virtual int Radius();
 	//draw the board
-	void Draw(void);
-
+	virtual void Draw(void);
+	virtual string Score();
+	virtual void Score(int);
+	virtual void Reset();
 	static int GetBoardX() {
 		return BOARD_X;
 	}
@@ -89,34 +94,33 @@ public:
 		float getX(){
 				return x_axis;
 			}
-			float getY(){
-					return y_axis;
+		float getY(){
+				return y_axis;
 				}
+		int	GetMove(){
+				return Mov;
+			}
+		void Move(int n){
+			Mov+=n;
+		}
 //	int GetMidx
 };
 
 class Pacman:public Board {
-
-
+	int score;
+	int radius;
 public:
-
-	Pacman(int x=13, int y=9):Board(x,y)
-{
-		/*192*/
-
-
-}
+	//static int Move=0;
+	Pacman(int x=13, int y=9);
 	void RemovePebbles();
-
-
+	void Draw();
+	string Score();
+	void Score(int);
+	int Radius();
+	void Reset();
 	virtual ~Pacman(){
 
 	}
-
-
-
-
-	bool CheckWalls();
 
 
 };

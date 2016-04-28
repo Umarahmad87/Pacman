@@ -68,10 +68,10 @@ void DrawGhost(int x/*starting x*/, int y/*starting y*/,
 // x= r cos (theta), y= r sin(theta)
 const int npmvertices = 1220;
 GLfloat pmvertices[npmvertices][2];
-void InitPMVertices(float radius) {
+void InitPMVertices(float radius,float angle2) {
 
 	float hdegree = (M_PI - M_PI / 2.0) / 360.0;
-	float angle = M_PI + M_PI / 6.0;
+	float angle = M_PI + M_PI / angle2;
 	for (int i = 0; i < npmvertices; ++i) {
 		pmvertices[i][0] = radius * cos(angle);
 		pmvertices[i][1] = radius * sin(angle);
@@ -80,15 +80,22 @@ void InitPMVertices(float radius) {
 }
 
 void DrawPacMan(float sx/*center x*/, float sy/*center y*/,
-		float radius/*Radius*/, const ColorNames &colorname/*Pacman Colour*/) {
+		float radius/*Radius*/, const ColorNames &colorname/*Pacman Colour*/,float angle) {
 
 	glColor3fv(colors[colorname]); // set the circle color
-	InitPMVertices(radius);
+	InitPMVertices(radius,angle);
 	glBegin(GL_TRIANGLE_FAN);
 	glVertex4f(sx, sy, 0, 1);
 	for (int i = 0; i < npmvertices; ++i)
 		glVertex4f(sx + pmvertices[i][0], sy + pmvertices[i][1], 0, 1);
 	glEnd();
+	DrawCircle(sx - radius + radius / 2, sy + (radius - radius / 2),
+			radius / 20, colors[BLACK]);
+}
+void DrawPacMan2(float sx/*center x*/, float sy/*center y*/,
+		float radius/*Radius*/, const ColorNames &colorname/*Pacman Colour*/,float angle) {
+
+	DrawCircle(sx, sy ,radius, colors[YELLOW]);
 	DrawCircle(sx - radius + radius / 2, sy + (radius - radius / 2),
 			radius / 20, colors[BLACK]);
 }
@@ -111,13 +118,46 @@ void Display()/**/{
 	int x, y;
 	float Px,Py,x1,y1;
 	b->GetInitPinkyPosition(x, y);
-	DrawGhost(x, y, PINK, 2 * b->GetCellSize(), 2 * b->GetCellSize());
+	//DrawGhost(Px, Py, PINK, 2 * b->GetCellSize(), 2 * b->GetCellSize());
 	pac[0]->GetPixel(Px,Py);
 	pac[0]->GetCell(x1,y1);
-	DrawPacMan(Px + 20 - 9, Py +20 - 8, 16, YELLOW);
+	pac[0]->Draw();
+	static int i=0;
+	// Pacman Movement
+	//DrawGhost(Px - 5, Py, PINK, 1.8 * pac[0]->GetCellSize(), 1.8 * pac[0]->GetCellSize());
+	if(pac[0]->movement==0){
+		DrawPacMan(Px + 20 - 9, Py + 20 - 8, pac[0]->Radius(), YELLOW,6.0);
+	}
+	if(pac[0]->movement==1){
+		if(pac[0]->GetMove()%8==0 or pac[0]->GetMove()%8==1 or pac[0]->GetMove()%8==2 or pac[0]->GetMove()%8==3)
+		DrawPacMan(Px + 20 - 9, Py + 20 - 8, pac[0]->Radius(), YELLOW,6.0);
+		else if(pac[0]->GetMove()%8==4 or pac[0]->GetMove()%8==5 or pac[0]->GetMove()%8==6 or pac[0]->GetMove()%8==7)
+			DrawPacMan2(Px + 20 - 9, Py + 20 - 8, pac[0]->Radius(), YELLOW,6.0);
+	}
+	if(pac[0]->movement==2){
+		if(pac[0]->GetMove()%8==0 or pac[0]->GetMove()%8==1 or pac[0]->GetMove()%8==2 or pac[0]->GetMove()%8==3)
+			DrawPacMan(Px + 20 - 9, Py +20 - 8, pac[0]->Radius(), YELLOW,-1.2);
+		else if(pac[0]->GetMove()%8==4 or pac[0]->GetMove()%8==5 or pac[0]->GetMove()%8==6 or pac[0]->GetMove()%8==7)
+			DrawPacMan2(Px + 20 - 9, Py + 20 - 8, pac[0]->Radius(), YELLOW,-1.2);
+	}
+	if(pac[0]->movement==3){
+		if(pac[0]->GetMove()%8==0 or pac[0]->GetMove()%8==1 or pac[0]->GetMove()%8==2 or pac[0]->GetMove()%8==3)
+		DrawPacMan(Px + 20 - 9, Py +20 - 8, pac[0]->Radius(), YELLOW,-3.0);
+		else if(pac[0]->GetMove()%8==4 or pac[0]->GetMove()%8==5 or pac[0]->GetMove()%8==6 or pac[0]->GetMove()%8==7)
+					DrawPacMan2(Px + 20 - 9, Py + 20 - 8, pac[0]->Radius() , YELLOW,-3.0);
+
+	}
+	if(pac[0]->movement==4){
+	if(pac[0]->GetMove()%8==0 or pac[0]->GetMove()%8==1 or pac[0]->GetMove()%8==2 or pac[0]->GetMove()%8==3)
+		DrawPacMan(Px + 20 - 9, Py +20 - 8, pac[0]->Radius() , YELLOW,1.5);
+	else if(pac[0]->GetMove()%8==4 or pac[0]->GetMove()%8==5 or pac[0]->GetMove()%8==6 or pac[0]->GetMove()%8==7)
+						DrawPacMan2(Px + 20 - 9, Py + 20 - 8, pac[0]->Radius(), YELLOW,1.5);}
+
+	// Pacman Movement
 	cout<<"x_pixel = "<<pac[0]->getX()<<" y_pixel= "<<pac[0]->getY()<<endl;
 	x = pac[0]->GetMidX();
-	DrawString(280/14, 680, "Score = 000", colors[5]);
+	string score="Score = ";
+	DrawString(280/14, 680, score += pac[0]->Score(), colors[5]);
 	pac[0]->RemovePebbles();
 //	glPopMatrix();
 	glutSwapBuffers(); // do not modify this line..
@@ -151,7 +191,6 @@ void NonPrintableKeys(int key, int x, int y) {
 		pac[0]->movement = 4;
 		//pac[0].Ymm();
 	}
-
 	/* This function calls the Display function to redo the drawing. Whenever you need to redraw just call
 	 * this function*/
 
@@ -166,7 +205,14 @@ void NonPrintableKeys(int key, int x, int y) {
 void PrintableKeys(unsigned char key, int x, int y) {
 	if (key == KEY_ESC/* Escape key ASCII*/) {
 		exit(1); // exit the program when escape key is pressed.
+		//pac[0]->Reset();
 	}
+	if(key==80 or key==80 + 32){
+		pac[0]->movement=0;
+	}
+	if(key==82 or key==82 + 32){
+			pac[0]->Reset();
+		}
 }
 
 /*
@@ -179,6 +225,7 @@ void PrintableKeys(unsigned char key, int x, int y) {
 void Timer(int m) {
 
 // implement your functionality here
+
 	if(pac[0]->movement==1){
 
 	pac[0]->Xmm();
@@ -195,6 +242,7 @@ void Timer(int m) {
 	if(pac[0]->movement==4){
 	pac[0]->Ymm();
 	cout<<"Movement = Down "<<endl;}
+	pac[0]->Move(1);
 // once again we tell the library to call our Timer function after next 1000/FPS
 	glutTimerFunc(1000.0 / FPS, Timer, 0);
 	glutPostRedisplay();
@@ -205,13 +253,12 @@ void Timer(int m) {
  * */
 int main(int argc, char*argv[]) {
 	b=new Board; // create a new board object to use in the Display Function ...
-	pac[0]=new Pacman;
+	pac[0]=new Pacman(13,9);
 	int width = 560, height = 720; // i have set my window size to be 560 x 720
 	InitRandomizer(); // seed the random number generator...
 	glutInit(&argc, argv); // initialize the graphics library...
-
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA); // we will be using color display mode
-	glutInitWindowPosition(500, 50); // set the initial position of our window
+	glutInitWindowPosition(500, 500); // set the initial position of our window
 	glutInitWindowSize(width, height); // set the size of our window
 	glutCreateWindow("CP's Pacman"); // set the title of our game window
 	SetCanvasSize(width, height); // set the number of pixels...
