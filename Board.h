@@ -44,6 +44,7 @@ public:
 	virtual string Score();
 	virtual void Score(int);
 	virtual void Reset();
+	virtual void Movement();
 	static int GetBoardX() {
 		return BOARD_X;
 	}
@@ -118,6 +119,7 @@ public:
 	void Score(int);
 	int Radius();
 	void Reset();
+	void Movement();
 	virtual ~Pacman(){
 
 	}

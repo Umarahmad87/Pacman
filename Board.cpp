@@ -202,6 +202,27 @@ Pacman::Pacman(int x_pos, int y_pos):Board(x_pos,y_pos)
 		score=0;
 
 }
+void Board::Movement(){
+
+}
+void Pacman::Movement(){
+	if(movement==1){
+
+			Xmm();
+			cout<<"Movement = Left "<<endl;
+			}
+			if(movement==2){
+			Xpp();
+			cout<<"Movement = Right "<<endl;
+			}
+			if(movement==3){
+			Ypp();
+			cout<<"Movement = Up "<<endl;
+			}
+			if(movement==4){
+			Ymm();
+			cout<<"Movement = Down "<<endl;}
+}
 void Board::Draw(void) {
 	glColor3f(0, 0, 1);
 	glPushMatrix();
