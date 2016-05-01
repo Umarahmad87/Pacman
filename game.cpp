@@ -1,14 +1,13 @@
 //============================================================================
-// Name        : brickSlayerITC.cpp
-// Author      : Sibt ul Hussain
-// Version     :
+// Name        : Pacman.cpp
 // Copyright   : (c) Reserved
-// Description : Basic 2D game of Brick Slayer...
+// Description : Basic 2D game of Pacman...
 //============================================================================
 
 #ifndef PACMAN_CPP_
 #define PACMAN_CPP_
 #include "Board.h"
+#include "Board2.h"
 #include "Ghost.h"
 #include "util.h"
 #include <iostream>
@@ -91,82 +90,101 @@ void DrawPacMan(float sx/*center x*/, float sy/*center y*/,
 		glVertex4f(sx + pmvertices[i][0], sy + pmvertices[i][1], 0, 1);
 	glEnd();
 	DrawCircle(sx - radius + radius / 2, sy + (radius - radius / 2),
-			radius / 20, colors[BLACK]);
+			radius / 10, colors[BLACK]);
 }
 void DrawPacMan2(float sx/*center x*/, float sy/*center y*/,
 		float radius/*Radius*/, const ColorNames &colorname/*Pacman Colour*/,float angle) {
 
 	DrawCircle(sx, sy ,radius, colors[YELLOW]);
 	DrawCircle(sx - radius + radius / 2, sy + (radius - radius / 2),
-			radius / 20, colors[BLACK]);
+			radius / 10, colors[PURPLE]);
 }
 
-enum Characters { pacman, pinky , board};
+enum Characters { pacman, pinky , board , blinky , inky , clyde};
 
 /*
  * Main Canvas drawing function.
  * */
 //Board *b;
-Board **pac=new Board *[5];
+
+Board2 *B;
 void Display()/**/{
 	// set the background color using function glClearColor.
 	// to change the background play with the red, green and blue values below.
 	// Note that r, g and b values must be in the range [0,1] where 0 means dim rid and 1 means pure red and so on.
 
-	glClearColor(0/*Red Component*/, 0.0/*Green Component*/,
-			0.0/*Blue Component*/, 0 /*Alpha component*/); // Red==Green==Blue==1 --> White Colour
+	glClearColor(0.0/*Red Component*/, 0.0/*Green Component*/,
+			0.0/*Blue Component*/, 0.0 /*Alpha component*/); // Red==Green==Blue==1 --> White Colour
 	glClear(GL_COLOR_BUFFER_BIT); //Update the colors
 	//glutPostRedisplay();
 	 //
 	//b->Draw();
-	pac[board]->Draw();
+	//DrawString(300, 300, "READY !", colors[5]);
+	B->pac[board]->Draw();
 	int x, y;
 	float Px,Py,x1,y1,Gx,Gy,Gcx,Gcy;
-	pac[board]->GetInitPinkyPosition(x, y);
-	pac[pinky]->GetPixel(Gx,Gy);
-	DrawGhost(Gx+11, Gy-6, PINK, 1.8 * pac[pinky]->GetCellSize(), 1.8 * pac[pinky]->GetCellSize());
+	float blinkyx,blinkyy,inkyx,inkyy,cx,cy;
+	B->pac[board]->GetInitPinkyPosition(x, y);
+	B->pac[pinky]->GetPixel(Gx,Gy);
+	B->pac[blinky]->GetPixel(blinkyx,blinkyy);
+	B->pac[inky]->GetPixel(inkyx,inkyy);
+	B->pac[clyde]->GetPixel(cx,cy);
+	if(B->Frightn()==1){
+	DrawGhost(Gx - 6, Gy-6, BLUE, 1.8 * B->pac[pinky]->GetCellSize(), 1.8 * B->pac[pinky]->GetCellSize());
+		DrawGhost(blinkyx - 6, blinkyy-6, BLUE, 1.8 * B->pac[blinky]->GetCellSize(), 1.8 * B->pac[blinky]->GetCellSize());
+		DrawGhost(inkyx - 6, inkyy-6,BLUE, 1.8 * B->pac[inky]->GetCellSize(), 1.8 * B->pac[inky]->GetCellSize());
+		DrawGhost(cx - 6, cy-6, BLUE, 1.8 * B->pac[clyde]->GetCellSize(), 1.8 * B->pac[clyde]->GetCellSize());}
 
-	pac[pacman]->GetPixel(Px,Py);
-	pac[pacman]->GetCell(x1,y1);
-	pac[pinky]->GetCell(Gcx,Gcy);
-	cout<<"Ghost x cell="<<Gcx<<" y cell="<<Gcy<<endl;
-	pac[pacman]->Draw();
+	else if(B->Frightn()==0){
+	DrawGhost(Gx - 6, Gy-6, PINK, 1.8 * B->pac[pinky]->GetCellSize(), 1.8 * B->pac[pinky]->GetCellSize());
+	DrawGhost(blinkyx - 6, blinkyy-6, RED, 1.8 * B->pac[blinky]->GetCellSize(), 1.8 * B->pac[blinky]->GetCellSize());
+	DrawGhost(inkyx - 6, inkyy-6,SKY_BLUE, 1.8 * B->pac[inky]->GetCellSize(), 1.8 * B->pac[inky]->GetCellSize());
+	DrawGhost(cx - 6, cy-6, ORANGE, 1.8 * B->pac[clyde]->GetCellSize(), 1.8 * B->pac[clyde]->GetCellSize());}
+	B->pac[pacman]->GetPixel(Px,Py);
+	B->pac[pacman]->GetCell(x1,y1);
+	B->pac[pinky]->GetCell(Gcx,Gcy);
+	//cout<<"Ghost x cell="<<Gcx<<" y cell="<<Gcy<<endl;
+	B->pac[pacman]->Draw();
 	// Pacman Movement
 	//DrawGhost(Px - 5, Py, PINK, 1.8 * pac[0]->GetCellSize(), 1.8 * pac[0]->GetCellSize());
-	if(pac[pacman]->movement==0){
-		DrawPacMan(Px + 20 - 9, Py + 20 - 8, pac[0]->Radius(), YELLOW,6.0);
+	if(B->pac[pacman]->movement==0){
+		DrawPacMan(Px + 20 - 9, Py + 20 - 8, B->pac[0]->Radius(), YELLOW,6.0);
 	}
-	if(pac[pacman]->movement==1){
-		if(pac[0]->GetMove()%8==0 or pac[0]->GetMove()%8==1 or pac[0]->GetMove()%8==2 or pac[0]->GetMove()%8==3)
-		DrawPacMan(Px + 20 - 9, Py + 20 - 8, pac[0]->Radius(), YELLOW,6.0);
-		else if(pac[0]->GetMove()%8==4 or pac[0]->GetMove()%8==5 or pac[0]->GetMove()%8==6 or pac[0]->GetMove()%8==7)
-			DrawPacMan2(Px + 20 - 9, Py + 20 - 8, pac[0]->Radius(), YELLOW,6.0);
+	if(B->pac[pacman]->movement==1){
+		if(B->pac[0]->GetMove()%6==0 or B->pac[0]->GetMove()%6==1 or B->pac[0]->GetMove()%6==2 )
+		DrawPacMan(Px + 20 - 9, Py + 20 - 8, B->pac[0]->Radius(), YELLOW,6.0);
+		else if(B->pac[0]->GetMove()%6==3 or B->pac[0]->GetMove()%6==4 or B->pac[0]->GetMove()%6==5)
+			DrawPacMan2(Px + 20 - 9, Py + 20 - 8, B->pac[0]->Radius(), YELLOW,6.0);
 	}
-	if(pac[pacman]->movement==2){
-		if(pac[0]->GetMove()%8==0 or pac[0]->GetMove()%8==1 or pac[0]->GetMove()%8==2 or pac[0]->GetMove()%8==3)
-			DrawPacMan(Px + 20 - 9, Py +20 - 8, pac[0]->Radius(), YELLOW,-1.2);
-		else if(pac[0]->GetMove()%8==4 or pac[0]->GetMove()%8==5 or pac[0]->GetMove()%8==6 or pac[0]->GetMove()%8==7)
-			DrawPacMan2(Px + 20 - 9, Py + 20 - 8, pac[0]->Radius(), YELLOW,-1.2);
+	if(B->pac[pacman]->movement==2){
+		if(B->pac[0]->GetMove()%6==0 or B->pac[0]->GetMove()%6==1 or B->pac[0]->GetMove()%6==2)
+			DrawPacMan(Px + 20 - 9, Py +20 - 8, B->pac[0]->Radius(), YELLOW,-1.2);
+		else if(B->pac[0]->GetMove()%6==3 or B->pac[0]->GetMove()%6==4 or B->pac[0]->GetMove()%6==5)
+			DrawPacMan2(Px + 20 - 9, Py + 20 - 8, B->pac[0]->Radius(), YELLOW,-1.2);
 	}
-	if(pac[pacman]->movement==3){
-		if(pac[0]->GetMove()%8==0 or pac[0]->GetMove()%8==1 or pac[0]->GetMove()%8==2 or pac[0]->GetMove()%8==3)
-		DrawPacMan(Px + 20 - 9, Py +20 - 8, pac[0]->Radius(), YELLOW,-3.0);
-		else if(pac[0]->GetMove()%8==4 or pac[0]->GetMove()%8==5 or pac[0]->GetMove()%8==6 or pac[0]->GetMove()%8==7)
-					DrawPacMan2(Px + 20 - 9, Py + 20 - 8, pac[0]->Radius() , YELLOW,-3.0);
+	if(B->pac[pacman]->movement==3){
+		if(B->pac[0]->GetMove()%6==0 or B->pac[0]->GetMove()%6==1 or B->pac[0]->GetMove()%6==2 )
+		DrawPacMan(Px + 20 - 9, Py +20 - 8, B->pac[0]->Radius(), YELLOW,-3.0);
+		else if(B->pac[0]->GetMove()%6==3 or B->pac[0]->GetMove()%6==4 or B->pac[0]->GetMove()%6==5)
+					DrawPacMan2(Px + 20 - 9, Py + 20 - 8, B->pac[0]->Radius() , YELLOW,-3.0);
 
 	}
-	if(pac[pacman]->movement==4){
-	if(pac[0]->GetMove()%8==0 or pac[0]->GetMove()%8==1 or pac[0]->GetMove()%8==2 or pac[0]->GetMove()%8==3)
-		DrawPacMan(Px + 20 - 9, Py +20 - 8, pac[0]->Radius() , YELLOW,1.5);
-	else if(pac[0]->GetMove()%8==4 or pac[0]->GetMove()%8==5 or pac[0]->GetMove()%8==6 or pac[0]->GetMove()%8==7)
-						DrawPacMan2(Px + 20 - 9, Py + 20 - 8, pac[0]->Radius(), YELLOW,1.5);}
+	if(B->pac[pacman]->movement==4){
+	if(B->pac[0]->GetMove()%6==0 or B->pac[0]->GetMove()%6==1 or B->pac[0]->GetMove()%6==2)
+		DrawPacMan(Px + 20 - 9, Py +20 - 8, B->pac[0]->Radius() , YELLOW,1.5);
+	else if(B->pac[0]->GetMove()%6==3 or B->pac[0]->GetMove()%6==4 or B->pac[0]->GetMove()%6==5)
+						DrawPacMan2(Px + 20 - 9, Py + 20 - 8, B->pac[0]->Radius(), YELLOW,1.5);}
 
 	// Pacman Movement
-	cout<<"x_pixel = "<<pac[pacman]->getX()<<" y_pixel= "<<pac[pacman]->getY()<<endl;
-	x = pac[pacman]->GetMidX();
+	//cout<<"x_pixel = "<<B->pac[pacman]->getX()<<" y_pixel= "<<B->pac[pacman]->getY()<<endl;
+	cout<<"Pacman: x_cell = "<<Px/20<<" y_cell= "<<Py/20<<endl;
+	//x = pac[pacman]->GetMidX();
 	string score="Score = ";
-	DrawString(280/14, 680, score += pac[pacman]->Score(), colors[5]);
-	pac[pacman]->RemovePebbles();
+	DrawString(280/14, 680, score += B->pac[pacman]->Score(), colors[5]);
+	//B->pac[pacman]->RemovePebbles();
+	if(B->pac[pacman]->RemovePebbles()==1){
+		B->Frightn(1);
+	}
 //	glPopMatrix();
 	glutSwapBuffers(); // do not modify this line..
 }
@@ -181,25 +199,24 @@ void Display()/**/{
  *
  * */
 
-void NonPrintableKeys(int key, int x, int y) {
+void NonPrintableKeys(int key, int x, int y){
 	if (key == GLUT_KEY_LEFT /*GLUT_KEY_LEFT is constant and contains ASCII for left arrow key*/) {
-		pac[0]->movement = 1;
+		B->pac[pacman]->movement = 1;
 
 	} else if (key == GLUT_KEY_RIGHT /*GLUT_KEY_RIGHT is constant and contains ASCII for right arrow key*/) {
-		pac[0]->movement = 2;
+		B->pac[pacman]->movement = 2;
 
 	}
 	else if (key == GLUT_KEY_UP/*GLUT_KEY_UP is constant and contains ASCII for up arrow key*/) {
-		pac[0]->movement = 3;
+		B->pac[pacman]->movement = 3;
 
 	}
 
 	else if (key == GLUT_KEY_DOWN/*GLUT_KEY_DOWN is constant and contains ASCII for down arrow key*/) {
-		pac[0]->movement = 4;
+		B->pac[pacman]->movement = 4;
 	}
 	/* This function calls the Display function to redo the drawing. Whenever you need to redraw just call
 	 * this function*/
-
 	// glutPostRedisplay();
 }
 
@@ -214,11 +231,13 @@ void PrintableKeys(unsigned char key, int x, int y) {
 		//pac[0]->Reset();
 	}
 	if(key==80 or key==80 + 32){
-		pac[0]->movement=0;
+		B->pac[0]->movement=0;
+		//B->Frightn(1);
 	}
 	if(key==82 or key==82 + 32){
-			pac[0]->Reset();
-		}
+			B->pac[0]->Reset();
+			//B->Frightn(0);
+	}
 }
 
 /*
@@ -231,13 +250,37 @@ void PrintableKeys(unsigned char key, int x, int y) {
 void Timer(int m) {
 
 // implement your functionality here
+	//for(int i=0;i<20000000;i++);
+	B->pac[pacman]->Movement();
+	B->pac[pinky]->Search();
+	if(B->Frightn()==0){
+	B->pac[blinky]->Movement();
+	B->pac[pinky]->Movement();
+	B->pac[inky]->Movement();
+	B->pac[clyde]->Movement();}
+	else if(B->Frightn()==1){
+		B->pac[blinky]->Movement2();
+		B->pac[pinky]->Movement2();
+		B->pac[inky]->Movement2();
+		B->pac[clyde]->Movement2();
 
-	pac[pacman]->Movement();
-	//pac[pinky]->Movement();
-	pac[0]->Move(1);
+	}
+	B->pac[0]->Move(1);
+	if(B->pac[pacman]->Pebbles()==241){
+		B->pac[pinky]->Start();
+	}
+	if(B->pac[pacman]->Pebbles()==170){
+			B->pac[inky]->Start();
+		}
+	if(B->pac[pacman]->Pebbles()==72){
+			B->pac[clyde]->Start();
+		}
+	if(B->Frightn()==1)
+		B->Count2();
+	B->Collision();
 // once again we tell the library to call our Timer function after next 1000/FPS
 	glutPostRedisplay();
-	glutTimerFunc(1000.0 / FPS, Timer, 0);
+	glutTimerFunc(120.0, Timer, 0);
 
 }
 
@@ -246,9 +289,20 @@ void Timer(int m) {
  * */
 int main(int argc, char*argv[]) {
 	//b=new Board; // create a new board object to use in the Display Function ...
-	pac[2]=new Board;
-	pac[0]=new Pacman(13,9);
-	pac[1]=new Ghost(13,21);
+	static Board **pacman=new Board *[5];
+	pacman[2]=new Board;
+	pacman[0]=new Pacman(13,9); /* 13,9*/
+	pacman[pinky]=new Ghost(13,18); /* 13,18*/
+	pacman[blinky]=new Ghost(13,21);/* 13,21*/
+	pacman[inky]=new Ghost(15,18);/* 15,18*/
+	pacman[clyde]=new Ghost(11,18);/* 11,18*/
+	B = new Board2;
+	B->insert(*pacman[0]);
+	B->insert(*pacman[1]);
+	B->insert(*pacman[2]);
+	B->insert(*pacman[blinky]);
+	B->insert(*pacman[inky]);
+	B->insert(*pacman[clyde]);
 	int width = 560, height = 720; // i have set my window size to be 560 x 720
 	InitRandomizer(); // seed the random number generator...
 	glutInit(&argc, argv); // initialize the graphics library...
@@ -265,8 +319,7 @@ int main(int argc, char*argv[]) {
 	glutSpecialFunc(NonPrintableKeys); // tell library which function to call for non-printable ASCII characters
 	glutKeyboardFunc(PrintableKeys); // tell library which function to call for printable ASCII characters
 // This function tells the library to call our Timer function after 1000.0/FPS milliseconds...
-	glutTimerFunc(1000.0 / FPS, Timer, 0);
-
+	glutTimerFunc(1000.0, Timer, 0);
 // now handle the control to library and it will call our registered functions when
 // it deems necessary...
 	glutMainLoop();

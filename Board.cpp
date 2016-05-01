@@ -16,86 +16,30 @@ const int Board::BOARD_X = 36;
 // have been given numbers in increasing order
 // e.g. NILL=0, TLC=1, TRC=2, BLC=3, BRC=4, and so on
 // and these numbers are represented in the board array...
-enum BoardParts {
-	NILL, // Prohibitive Empty space
-	TLC, // Left corner top
-	TRC, //Right corner top
-	BLC, // Left corner bottom
-	BRC, //Right corner bottom
-	BT, // Border Drawing top
-	BB, // Border Drawing bottom
-	BL, // Border Drawing left
-	BR, // Border Drawing right
-	HL, // Horizontal line
-	VL, // Vertical line
-	GG, // Ghost Gate
-	BTLC, // Border Left corner top
-	BTRC, //Border Right corner top
-	BBLC, //Border Left corner bottom
-	BBRC, //Border Right corner bottom
-	PEBB, // Pebbles
-	VE, // Valid Empty, means pacman can move over here...
-	SB, // Solid Ball
-	GH, // Ghoust House
-	SBR, // straight line with bottom right corner
-	SBL, // straight line with bottom left corner
-	// vertical straight lines for different border...
-	VTR,
-	VTL,
-	VBR,
-	VBL
-};
-// defining some utility functions...
 
-static int board_array[Board::BOARD_X][Board::BOARD_Y] = {
-		{ 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-		{ 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0 },
-		{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0 },
-		{ BBRC, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,SBL, SBR, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, BBLC },
-		{ 7, 16, 16, 16,16, 16, 16, 16, 16, 16, 16, 16, 16, 10, 10, 16, 16, 16, 16, 16, 16, 16,16, 16, 16, 16, 16, BR },
-		{ 7, 16, BRC, 9, 9, BLC, 16, BRC, 9, 9, 9,BLC, 16, 10, 10, 16, BRC, 9, 9, 9, BLC, 16, BRC, 9, 9, BLC, 16, BR },
-		{7, 18, 10, 0, 0, 10, 16, 10, 0, 0, 0, 10, 16, 10, 10, 16, 10, 0, 0, 0,10, 16, 10, 0, 0, 10, 18, BR },
-		{ 7, 16, TRC, 9, 9, TLC, 16, TRC, 9, 9, 9, TLC, 16, TRC, TLC, 16, TRC,9, 9, 9, TLC, 16, TRC, 9, 9, TLC, 16, BR },
-		{ 7, 16, 16, 16, 16,16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,16, 16, 16, 16, 16, 16, BR },
-		{ 7, 16, BRC, 9, 9, BLC, 16, BRC,BLC, 16, BRC, 9, 9, 9, 9, 9, 9, BLC, 16, BRC, BLC, 16, BRC, 9,9, BLC, 16, BR },
-		{ 7, 16, 2, 9, 9, 1, 16, 10, 10, 16, TRC, 9,9, 3, 4, 9, 9, 1, 16, 10, 10, 16, 2, 9, 9, 1, 16, BR },
-		{ 7, 16,16, 16, 16, 16, 16, 10, 10, 16, 16, 16, 16, 10, 10, 16, 16, 16,16, 10, 10, 16, 16, 16, 16, 16, 16, BR },
-		{ BTRC, 6, 6, 6, 6,BLC, 16, 10, TRC, 9, 9, BLC, 17, 10, 10, 17, BRC, 9, 9, TLC, 10,16, BRC, 6, 6, 6, 6, 12 },
-		{ 0, 0, 0, 0, 0, 7, 16, 10, BRC, 9,9, TLC, 17, TRC, TLC, 17, TRC, 9, 9, BLC, 10, 16, 8, 0, 0, 0, 0,0 },
-		{ 0, 0, 0, 0, 0, 7, 16, 10, 10, 17, 17, 17, 17, 17, 17, 17,17, 17, 17, 10, 10, 16, 8, 0, 0, 0, 0, 0 },
-		{ 0, 0, 0, 0, 0, 7,16, 10, 10, 17, BRC, 6, 6, 11, 11, 6, 6, BLC, 17, 10, 10, 16, 8,0, 0, 0, 0, 0 },
-		{ 5, 5, 5, 5, 5, TLC, 16, TRC, TLC, 17, 8, 19,19, 19, 19, 19, 19, 7, 17, TRC, TLC, 16, TRC, 5, 5, 5, 5, 5 },
-		{17, 17, 17, 17, 17, 17, 16, 17, 17, 17, 8, 19, 19, 19, 19, 19,	19, 7, 17, 17, 17, 16, 17, 17, 17, 17, 17, 17 },
-		{ BB, BB, BB,BB, BB, BLC, 16, BRC, BLC, 17, 8, 19, 19, 19, 19, 19, 19, 7, 17,BRC, BLC, 16, BRC, BB, BB, BB, BB, BB },
-		{ 0, 0, 0, 0, 0, 7, 16,10, 10, 17, TRC, BT, BT, BT, BT, BT, BT, TLC, 17, 10, 10, 16, 8,0, 0, 0, 0, 0 },
-		{ 0, 0, 0, 0, 0, 7, 16, 10, 10, 17, 17, 17, 17,17, 17, 17, 17, 17, 17, 10, 10, 16, 8, 0, 0, 0, 0, 0 },
-		{ 0, 0,0, 0, 0, 7, 16, 10, 10, 17, BRC, HL, HL, HL, HL, HL, HL, BLC,VE, 10, 10, 16, 8, 0, 0, 0, 0, 0 },
-		{ BBRC, 5, 5, 5, 5, TLC, 16,TRC, TLC, 17, TRC, HL, HL, BLC, BRC, HL, HL, TLC, 17, TRC, TLC,16, TRC, 5, 5, 5, 5, BBLC },
-		{ 7, 16, 16, 16, 16, 16, 16, 16,16, 16, 16, 16, 16, VL, VL, 16, 16, 16, 16, 16, 16, 16, 16, 16,16, 16, 16, BR },
-		{ 7, 16, BRC, HL, HL, BLC, 16, BRC, HL, HL,HL, BLC, 16, VL, VL, 16, BRC, HL, HL, HL, BLC, 16, BRC, HL, HL,BLC, 16, BR },
-		{ 7, 16, TRC, HL, BLC, VL, 16, TRC, HL, HL, HL,TLC, 16, TRC, TLC, 16, TRC, HL, HL, HL, TLC, 16, VL, BRC, HL,TLC, 16, BR },
-		{ 7, SB, 16, 16, VL, VL, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,16, 16, 16, 16, VL, VL, 16, 16, SB, BR },
-		{ VTR, HL, BLC, 16,VL, VL, 16, BRC, BLC, 16, BRC, HL, HL, HL, HL, HL, HL, BLC, 16,BRC, BLC, 16, VL, VL, 16, BRC, HL, VTL },
-		{ VBR, HL, TLC, 16,TRC, TLC, 16, VL, VL, 16, TRC, HL, HL, BLC, BRC, HL, HL, TLC,16, VL, VL, 16, TRC, TLC, 16, TRC, HL, VBL },
-		{ 7, 16, 16, 16,16, 16, 16, VL, VL, 16, 16, 16, 16, VL, VL, 16, 16, 16, 16, VL,VL, 16, 16, 16, 16, 16, 16, BR },
-		{ 7, 16, BRC, HL, HL, HL, HL,TLC, TRC, HL, HL, BLC, 16, VL, VL, 16, BRC, HL, HL, TLC, TRC,HL, HL, HL, HL, BLC, 16, BR },
-		{ 7, 16, TRC, HL, HL, HL, HL, HL,HL, HL, HL, TLC, 16, TRC, TLC, 16, TRC, HL, HL, HL, HL, HL, HL,HL, HL, TLC, 16, BR },
-		{ 7, 16, 16, 16, 16, 16, 16, 16, 16, 16,16, 16, PEBB, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16,16, BR },
-		{ BTRC, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, BB,BB, BB, BB, BB, BB, BB, BB, BB, BB, BB, BTLC },
-		{ 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0 },
-		{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
-void Board::RemovePebbles(){
+bool Board::RemovePebbles(){
 		cout<<"Board::Pebbles"<<endl;
 	}
-void Pacman::RemovePebbles(){
-	cout<<"Pacman::Pebbles"<<endl;
+void Board::Start(){
+
+}
+bool Pacman::RemovePebbles(){
+	//cout<<"Pacman::Pebbles"<<endl;
 		int x,y;
 		x=x_cell;
 		y=y_cell;
 	if(board_array[35-y][x]==PEBB){
 		board_array[35-y][x]=0;
 		Score(10);
+		this->pebbles_left--;
+		return 0;
 	}
+	if(board_array[35-y][x]==SB){
+			board_array[35-y][x]=0;
+			Score(100);
+			return 1;
+		}
+	return 0;
 	}
 void Pacman::Draw(){
 	//DrawPacMan(Px + 20 - 9, Py +20 - 8, 16, YELLOW);
@@ -106,9 +50,9 @@ void Board::Xpp(){
 	int x,y;
 	x=floor(x_cell);
 	y=y_cell;
-	cout<<" Board = "<<board_array[35-y][x+1]<<endl;
+	//cout<<" Board = "<<board_array[35-y][x+1]<<endl;
 	if(board_array[35-y][x+1]==PEBB or board_array[35-y][x+1]==0 or board_array[35-y][x+1]==SB or board_array[35-y][x+1]==VE ){
-		x_axis += 5;
+		x_axis += increment;
 		x_cell = x_axis/xcellsize;}
 		//y_cell = y_axis/20.0;
 }
@@ -117,9 +61,9 @@ void Board::Xmm(){
 	int x,y;
 	x=ceil(x_cell);
 	y=y_cell;
-	cout<<" Board = "<<board_array[35-y][x-1]<<endl;
+	//cout<<" Board = "<<board_array[35-y][x-1]<<endl;
 	if(board_array[35-y][x-1]==PEBB or board_array[35-y][x-1]==0 or board_array[35-y][x-1]==SB or board_array[35-y][x-1]==VE ){
-		x_axis -= 5;
+		x_axis -= increment;
 		x_cell = x_axis / xcellsize;	}
 		//y_cell = y_axis/20.0;
 }
@@ -128,18 +72,18 @@ void Board::Ypp(){
 	int x,y;
 	x=x_cell;
 	y=floor(y_cell);
-	cout<<" Board = "<<board_array[35-y-1][x]<<endl;
+	//cout<<" Board = "<<board_array[35-y-1][x]<<endl;
 	if(board_array[35-y-1][x]==PEBB or board_array[35-y-1][x]==0 or board_array[35-y-1][x]==SB or board_array[35-y-1][x]==VE ){
-		y_axis += 5;
+		y_axis += increment;
 		y_cell = y_axis/ycellsize;}
 		}
 void Board::Ymm(){
 		int x,y;
 		x=x_cell;
 		y=ceil(y_cell);
-		cout<<" Board = "<<board_array[35-y+1][x]<<endl;
+		//cout<<" Board = "<<board_array[35-y+1][x]<<endl;
 		if(board_array[35-y+1][x]==PEBB or board_array[35-y+1][x]==0 or board_array[35-y+1][x]==SB or board_array[35-y+1][x]==VE){
-		y_axis -= 5;
+		y_axis -= increment;
 		y_cell = y_axis/ycellsize;}
 		}
 string Board::Score(){ return NULL;}
@@ -161,7 +105,7 @@ string Pacman::Score(){
 			cout<<C[j];
 		string s1;
 		s1=C;
-		cout<<endl<<s1;
+		//cout<<endl<<s1;
 		return s1;}
 void Board::Score(int n){}
 void Pacman::Score(int n){ score+=n;}
@@ -174,6 +118,41 @@ void Pacman::Reset(){
 	x_axis=x_cell*xcellsize;
 	y_axis=y_cell*ycellsize;
 	movement=0;
+}
+bool Board::Block_left(){
+	int x,y;
+		x=ceil(x_cell);
+		y=y_cell;
+		if(board_array[35-y][x-1]==PEBB or board_array[35-y][x-1]==0 or board_array[35-y][x-1]==SB or board_array[35-y][x-1]==VE )
+			return 0;
+		return 1;
+}
+bool Board::Block_right(){
+	int x,y;
+	x=floor(x_cell);
+	y=y_cell;
+	if(board_array[35-y][x+1]==PEBB or board_array[35-y][x+1]==0 or board_array[35-y][x+1]==SB or board_array[35-y][x+1]==VE )
+		return 0;
+	return 1;
+}
+bool Board::Block_up(){
+	int x,y;
+	x=x_cell;
+	y=floor(y_cell);
+	if(board_array[35-y-1][x]==PEBB or board_array[35-y-1][x]==0 or board_array[35-y-1][x]==SB or board_array[35-y-1][x]==VE )
+		return 0;
+	return 1;
+}
+bool Board::Block_down(){
+	int x,y;
+	x=x_cell;
+	y=ceil(y_cell);
+	if(board_array[35-y+1][x]==PEBB or board_array[35-y+1][x]==0 or board_array[35-y+1][x]==SB or board_array[35-y+1][x]==VE)
+		return 0;
+	return 1;
+}
+void Board::Search(){
+
 }
 // Destructor
 Board::~Board(void) {}
@@ -195,24 +174,38 @@ Board::Board(int x_i, int y_i) {
 		y_cell=y_i;
 		x_axis=x_cell*xcellsize; /*280*/
 		y_axis=y_cell*ycellsize;
+		pebbles_left=242;
 }
 Pacman::Pacman(int x_pos, int y_pos):Board(x_pos,y_pos)
 {		radius=16;
 		/*192*/
 		score=0;
+		increment=20;
+		//pebbles_left=242;
 
 }
 void Board::Movement(){
 
 }
 void Pacman::Movement(){
+
 	if(movement==1){
 
 			Xmm();
+			if(this->x_cell==0){
+						x_cell=27;
+						x_axis=20*x_cell;
+						movement=1;
+					}
 			cout<<"Movement = Left "<<endl;
 			}
 			if(movement==2){
 			Xpp();
+			if(this->x_cell==27){
+					x_cell=0;
+					x_axis=20*0;
+					movement=2;
+				}
 			cout<<"Movement = Right "<<endl;
 			}
 			if(movement==3){
@@ -223,6 +216,7 @@ void Pacman::Movement(){
 			Ymm();
 			cout<<"Movement = Down "<<endl;}
 }
+void Board::Movement2(){ }
 void Board::Draw(void) {
 	glColor3f(0, 0, 1);
 	glPushMatrix();
