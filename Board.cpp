@@ -21,7 +21,19 @@ bool Board::RemovePebbles(){
 		cout<<"Board::Pebbles"<<endl;
 	}
 void Board::Start(){
-
+	for(int i=0;i<36;i++){
+			for(int j=0;j<28;j++){
+					if(board_array[35-i][j]==0)
+						board_array[35-i][j]=16;
+					if(i==35-6 and j==1)
+						board_array[35-i][j]=SB;
+					if(i==35-6 and j==26)
+							board_array[35-i][j]=SB;
+					if(i==35-26 and j==1)
+							board_array[35-i][j]=SB;
+					if(i==35-26 and j==26)
+							board_array[35-i][j]=SB;
+			}}
 }
 bool Pacman::RemovePebbles(){
 	//cout<<"Pacman::Pebbles"<<endl;
@@ -37,6 +49,7 @@ bool Pacman::RemovePebbles(){
 	if(board_array[35-y][x]==SB){
 			board_array[35-y][x]=0;
 			Score(100);
+			this->pebbles_left--;
 			return 1;
 		}
 	return 0;
@@ -111,12 +124,13 @@ void Board::Score(int n){}
 void Pacman::Score(int n){ score+=n;}
 int Board::Radius(){ return 20;}
 int Pacman::Radius(){ return radius;}
-void Board::Reset(){}
-void Pacman::Reset(){
+void Board::Reset(int x,int y){}
+void Pacman::Reset(int x,int y){
 	x_cell=13;
 	y_cell=9;
 	x_axis=x_cell*xcellsize;
 	y_axis=y_cell*ycellsize;
+	if(this->pebbles_left==246) score=0;
 	movement=0;
 }
 bool Board::Block_left(){
@@ -174,7 +188,7 @@ Board::Board(int x_i, int y_i) {
 		y_cell=y_i;
 		x_axis=x_cell*xcellsize; /*280*/
 		y_axis=y_cell*ycellsize;
-		pebbles_left=242;
+		pebbles_left=246;
 }
 Pacman::Pacman(int x_pos, int y_pos):Board(x_pos,y_pos)
 {		radius=16;
@@ -197,7 +211,7 @@ void Pacman::Movement(){
 						x_axis=20*x_cell;
 						movement=1;
 					}
-			cout<<"Movement = Left "<<endl;
+			//cout<<"Movement = Left "<<endl;
 			}
 			if(movement==2){
 			Xpp();
@@ -206,15 +220,16 @@ void Pacman::Movement(){
 					x_axis=20*0;
 					movement=2;
 				}
-			cout<<"Movement = Right "<<endl;
+			//cout<<"Movement = Right "<<endl;
 			}
 			if(movement==3){
 			Ypp();
-			cout<<"Movement = Up "<<endl;
+			//cout<<"Movement = Up "<<endl;
 			}
 			if(movement==4){
 			Ymm();
-			cout<<"Movement = Down "<<endl;}
+			//cout<<"Movement = Down "<<endl;
+			}
 }
 void Board::Movement2(){ }
 void Board::Draw(void) {

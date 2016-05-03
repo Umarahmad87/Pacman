@@ -29,9 +29,9 @@ public:
 		x_axis=x_cell*20.0;
 		y_axis=y_cell*20.0;
 	}
-	void Reset(){
-		x_cell=13;
-		y_cell=18;
+	void Reset(int x=13,int y=18){
+		x_cell=x;
+		y_cell=y;
 		x_axis=x_cell*xcellsize;
 		y_axis=y_cell*ycellsize;
 	}
@@ -331,23 +331,32 @@ public:
 	void Movement2(){
 		if(move_r==Left and Block_left()==0){
 					if(Block_left()==0){
-						x_cell -= 1;
-						x_axis = x_cell * 20.0;
+						//x_cell -= 1;
+						//x_axis = x_cell * 20.0;
+						x_axis = x_axis - 10.0;
+						x_cell = ceil(x_axis/20.0);
 						move_r= Left;
 					}}
 				else if(move_r==Right and Block_right()==0){
-					x_cell += 1;
-					x_axis = x_cell * 20.0;
+					//x_cell += 1;
+					//x_axis = x_cell * 20.0;
+					x_axis = x_axis + 10.0;
+					x_cell = x_axis/20.0;
 					move_r= Right;
 				}
 				else if(move_r==up and Block_up()==0){
-							y_cell += 1;
-							y_axis = y_cell * 20.0;
+						//	y_cell += 1;
+						//	y_axis = y_cell * 20.0;
+					y_axis = y_axis + 10.0;
+					y_cell =floor(y_axis/20.0);
 							move_r= up;
 						}
 				else if(move_r==down and Block_down()==0){
-							y_cell -= 1;
-							y_axis = y_cell * 20.0;
+							//y_cell -= 1;
+							//y_axis = y_cell * 20.0;
+
+					y_axis = y_axis - 10.0;
+					y_cell = ceil(y_axis/20.0);
 							move_r= down;
 						}
 				else

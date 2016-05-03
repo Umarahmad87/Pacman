@@ -97,7 +97,7 @@ void DrawPacMan2(float sx/*center x*/, float sy/*center y*/,
 
 	DrawCircle(sx, sy ,radius, colors[YELLOW]);
 	DrawCircle(sx - radius + radius / 2, sy + (radius - radius / 2),
-			radius / 10, colors[PURPLE]);
+			radius / 10, colors[BLACK]);
 }
 
 enum Characters { pacman, pinky , board , blinky , inky , clyde};
@@ -120,6 +120,16 @@ void Display()/**/{
 	 //
 	//b->Draw();
 	//DrawString(300, 300, "READY !", colors[5]);
+	if(B->GetLife()<=0 or B->pac[0]->Pebbles()<=0){
+			DrawString(230, 300, "Game Over", colors[5]);
+			DrawString(170, 425, "Press R to play again...", colors[RED]);}
+	cout<<"Pebbles Left :"<<B->pac[0]->Pebbles()<<endl;
+	// Life
+	for(int life=0,x=40;life <(B->GetLife());life++){
+	DrawPacMan(x , 20, B->pac[0]->Radius() , YELLOW,6.0);
+	x+=40;}
+
+
 	B->pac[board]->Draw();
 	int x, y;
 	float Px,Py,x1,y1,Gx,Gy,Gcx,Gcy;
@@ -151,28 +161,28 @@ void Display()/**/{
 		DrawPacMan(Px + 20 - 9, Py + 20 - 8, B->pac[0]->Radius(), YELLOW,6.0);
 	}
 	if(B->pac[pacman]->movement==1){
-		if(B->pac[0]->GetMove()%6==0 or B->pac[0]->GetMove()%6==1 or B->pac[0]->GetMove()%6==2 )
+		if(B->pac[0]->GetMove()%2==0)
 		DrawPacMan(Px + 20 - 9, Py + 20 - 8, B->pac[0]->Radius(), YELLOW,6.0);
-		else if(B->pac[0]->GetMove()%6==3 or B->pac[0]->GetMove()%6==4 or B->pac[0]->GetMove()%6==5)
+		else if(B->pac[0]->GetMove()%2==1)
 			DrawPacMan2(Px + 20 - 9, Py + 20 - 8, B->pac[0]->Radius(), YELLOW,6.0);
 	}
 	if(B->pac[pacman]->movement==2){
-		if(B->pac[0]->GetMove()%6==0 or B->pac[0]->GetMove()%6==1 or B->pac[0]->GetMove()%6==2)
+		if(B->pac[0]->GetMove()%2==0)
 			DrawPacMan(Px + 20 - 9, Py +20 - 8, B->pac[0]->Radius(), YELLOW,-1.2);
-		else if(B->pac[0]->GetMove()%6==3 or B->pac[0]->GetMove()%6==4 or B->pac[0]->GetMove()%6==5)
+		else if(B->pac[0]->GetMove()%2==1 )
 			DrawPacMan2(Px + 20 - 9, Py + 20 - 8, B->pac[0]->Radius(), YELLOW,-1.2);
 	}
 	if(B->pac[pacman]->movement==3){
-		if(B->pac[0]->GetMove()%6==0 or B->pac[0]->GetMove()%6==1 or B->pac[0]->GetMove()%6==2 )
+		if(B->pac[0]->GetMove()%2==0  )
 		DrawPacMan(Px + 20 - 9, Py +20 - 8, B->pac[0]->Radius(), YELLOW,-3.0);
-		else if(B->pac[0]->GetMove()%6==3 or B->pac[0]->GetMove()%6==4 or B->pac[0]->GetMove()%6==5)
+		else if(B->pac[0]->GetMove()%2==1)
 					DrawPacMan2(Px + 20 - 9, Py + 20 - 8, B->pac[0]->Radius() , YELLOW,-3.0);
 
 	}
 	if(B->pac[pacman]->movement==4){
-	if(B->pac[0]->GetMove()%6==0 or B->pac[0]->GetMove()%6==1 or B->pac[0]->GetMove()%6==2)
+	if(B->pac[0]->GetMove()%2==0)
 		DrawPacMan(Px + 20 - 9, Py +20 - 8, B->pac[0]->Radius() , YELLOW,1.5);
-	else if(B->pac[0]->GetMove()%6==3 or B->pac[0]->GetMove()%6==4 or B->pac[0]->GetMove()%6==5)
+	else if(B->pac[0]->GetMove()%2==1)
 						DrawPacMan2(Px + 20 - 9, Py + 20 - 8, B->pac[0]->Radius(), YELLOW,1.5);}
 
 	// Pacman Movement
@@ -180,7 +190,8 @@ void Display()/**/{
 	cout<<"Pacman: x_cell = "<<Px/20<<" y_cell= "<<Py/20<<endl;
 	//x = pac[pacman]->GetMidX();
 	string score="Score = ";
-	DrawString(280/14, 680, score += B->pac[pacman]->Score(), colors[5]);
+	DrawString(280/14, 680, score += B->pac[pacman]->Score(), colors[WHITE]);
+
 	//B->pac[pacman]->RemovePebbles();
 	if(B->pac[pacman]->RemovePebbles()==1){
 		B->Frightn(1);
@@ -200,6 +211,8 @@ void Display()/**/{
  * */
 
 void NonPrintableKeys(int key, int x, int y){
+	if(B->GetLife()>0 and B->pac[0]->Pebbles()>0){
+	if(B->Pause()==0){
 	if (key == GLUT_KEY_LEFT /*GLUT_KEY_LEFT is constant and contains ASCII for left arrow key*/) {
 		B->pac[pacman]->movement = 1;
 
@@ -218,6 +231,7 @@ void NonPrintableKeys(int key, int x, int y){
 	/* This function calls the Display function to redo the drawing. Whenever you need to redraw just call
 	 * this function*/
 	// glutPostRedisplay();
+	}}
 }
 
 /*This function is called (automatically) whenever any printable key (such as x,b, enter, etc.)
@@ -230,12 +244,17 @@ void PrintableKeys(unsigned char key, int x, int y) {
 		exit(1); // exit the program when escape key is pressed.
 		//pac[0]->Reset();
 	}
-	if(key==80 or key==80 + 32){
-		B->pac[0]->movement=0;
+	if(key==80 or key==80 + 32){  // P
+		//B->pac[0]->movement=0;
+		B->Pause(0);
 		//B->Frightn(1);
 	}
-	if(key==82 or key==82 + 32){
-			B->pac[0]->Reset();
+	if(key==82 or key==82 + 32){  // R
+			//B->pac[0]->Reset();
+		if(B->GetLife()==0 or B->pac[0]->Pebbles()==0){
+			B->All_Reset();
+			B->pac[board]->Start();
+		}
 			//B->Frightn(0);
 	}
 }
@@ -251,8 +270,11 @@ void Timer(int m) {
 
 // implement your functionality here
 	//for(int i=0;i<20000000;i++);
+	if(B->GetLife()>0 and B->pac[0]->Pebbles()>0){
+	if(B->Pause()==0){
 	B->pac[pacman]->Movement();
 	B->pac[pinky]->Search();
+
 	if(B->Frightn()==0){
 	B->pac[blinky]->Movement();
 	B->pac[pinky]->Movement();
@@ -265,7 +287,7 @@ void Timer(int m) {
 		B->pac[clyde]->Movement2();
 
 	}
-	B->pac[0]->Move(1);
+	B->pac[0]->Move(1);}}
 	if(B->pac[pacman]->Pebbles()==241){
 		B->pac[pinky]->Start();
 	}
@@ -280,7 +302,7 @@ void Timer(int m) {
 	B->Collision();
 // once again we tell the library to call our Timer function after next 1000/FPS
 	glutPostRedisplay();
-	glutTimerFunc(120.0, Timer, 0);
+	glutTimerFunc(100.0, Timer, 0);
 
 }
 
@@ -307,7 +329,7 @@ int main(int argc, char*argv[]) {
 	InitRandomizer(); // seed the random number generator...
 	glutInit(&argc, argv); // initialize the graphics library...
 	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA); // we will be using color display mode
-	glutInitWindowPosition(500, 500); // set the initial position of our window
+	glutInitWindowPosition(50, 500); // set the initial position of our window
 	glutInitWindowSize(width, height); // set the size of our window
 	glutCreateWindow("CP's Pacman"); // set the title of our game window
 	SetCanvasSize(width, height); // set the number of pixels...
