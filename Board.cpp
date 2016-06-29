@@ -17,26 +17,71 @@ const int Board::BOARD_X = 36;
 // e.g. NILL=0, TLC=1, TRC=2, BLC=3, BRC=4, and so on
 // and these numbers are represented in the board array...
 
-bool Board::RemovePebbles(){
+int Board::RemovePebbles(){
 		cout<<"Board::Pebbles"<<endl;
+		return 0;
 	}
-void Board::Start(){
+void Board::SetColor(int n){
+	if(n==0)
+	this->bcolor=NAVY;
+	if(n==1)
+	this->bcolor=INDIGO;
+	if(n==2)
+	this->bcolor=DARK_VIOLET;
+	if(n==3)
+		this->bcolor=LIGHT_GRAY;
+}
+void Board::Frightn(int n){}
+int Board::Frightn(){ return 0;}
+void Board::Start(int level){
 	for(int i=0;i<36;i++){
 			for(int j=0;j<28;j++){
 					if(board_array[35-i][j]==0)
 						board_array[35-i][j]=16;
-					if(i==35-6 and j==1)
+					if(i==35-8 and j==1)
 						board_array[35-i][j]=SB;
-					if(i==35-6 and j==26)
+					if(i==35-8 and j==26)
 							board_array[35-i][j]=SB;
 					if(i==35-26 and j==1)
 							board_array[35-i][j]=SB;
 					if(i==35-26 and j==26)
 							board_array[35-i][j]=SB;
 			}}
+
 }
-bool Pacman::RemovePebbles(){
-	//cout<<"Pacman::Pebbles"<<endl;
+void Board::Load_Level(int lev){
+	if(lev==0 or lev==1){
+			for(int i=0;i<36;i++){
+						for(int j=0;j<28;j++){
+							board_array[i][j]=board_array1[i][j];
+						}}
+
+		}
+	else if(lev==2 or lev==3){
+				for(int i=0;i<36;i++){
+							for(int j=0;j<28;j++){
+								board_array[i][j]=board_array2[i][j];
+							}}
+
+			}
+}
+void Pacman::Load_Level(int lev){
+	if(lev==0 or lev==1){
+				for(int i=0;i<36;i++){
+							for(int j=0;j<28;j++){
+								board_array[i][j]=board_array1[i][j];
+							}}
+
+			}
+		else if(lev==2 or lev==3){
+					for(int i=0;i<36;i++){
+								for(int j=0;j<28;j++){
+									board_array[i][j]=board_array2[i][j];
+								}}
+
+				}
+}
+int Pacman::RemovePebbles(){
 		int x,y;
 		x=x_cell;
 		y=y_cell;
@@ -44,7 +89,7 @@ bool Pacman::RemovePebbles(){
 		board_array[35-y][x]=0;
 		Score(10);
 		this->pebbles_left--;
-		return 0;
+		return 2;
 	}
 	if(board_array[35-y][x]==SB){
 			board_array[35-y][x]=0;
@@ -54,38 +99,29 @@ bool Pacman::RemovePebbles(){
 		}
 	return 0;
 	}
-void Pacman::Draw(){
-	//DrawPacMan(Px + 20 - 9, Py +20 - 8, 16, YELLOW);
-}
+
 void Board::Xpp(){
 
-		//x_cell += 1;
 	int x,y;
 	x=floor(x_cell);
 	y=y_cell;
-	//cout<<" Board = "<<board_array[35-y][x+1]<<endl;
 	if(board_array[35-y][x+1]==PEBB or board_array[35-y][x+1]==0 or board_array[35-y][x+1]==SB or board_array[35-y][x+1]==VE ){
 		x_axis += increment;
 		x_cell = x_axis/xcellsize;}
-		//y_cell = y_axis/20.0;
 }
 void Board::Xmm(){
-	//	x_cell -= 1;
 	int x,y;
 	x=ceil(x_cell);
 	y=y_cell;
-	//cout<<" Board = "<<board_array[35-y][x-1]<<endl;
 	if(board_array[35-y][x-1]==PEBB or board_array[35-y][x-1]==0 or board_array[35-y][x-1]==SB or board_array[35-y][x-1]==VE ){
 		x_axis -= increment;
 		x_cell = x_axis / xcellsize;	}
-		//y_cell = y_axis/20.0;
 }
 void Board::Ypp(){
 	//	y_cell += 1;
 	int x,y;
 	x=x_cell;
 	y=floor(y_cell);
-	//cout<<" Board = "<<board_array[35-y-1][x]<<endl;
 	if(board_array[35-y-1][x]==PEBB or board_array[35-y-1][x]==0 or board_array[35-y-1][x]==SB or board_array[35-y-1][x]==VE ){
 		y_axis += increment;
 		y_cell = y_axis/ycellsize;}
@@ -94,11 +130,12 @@ void Board::Ymm(){
 		int x,y;
 		x=x_cell;
 		y=ceil(y_cell);
-		//cout<<" Board = "<<board_array[35-y+1][x]<<endl;
 		if(board_array[35-y+1][x]==PEBB or board_array[35-y+1][x]==0 or board_array[35-y+1][x]==SB or board_array[35-y+1][x]==VE){
 		y_axis -= increment;
 		y_cell = y_axis/ycellsize;}
 		}
+int Board::score2(){ return 0;}
+int Pacman::score2(){ return score;}
 string Board::Score(){ return NULL;}
 string Pacman::Score(){
 	int i=0,A[10],count=0;
@@ -114,26 +151,36 @@ string Pacman::Score(){
 			{C[p]=char(A[u]+48);
 			p=p+1;
 			}
-		for(int j=0;j<count;j++)
-			cout<<C[j];
 		string s1;
 		s1=C;
-		//cout<<endl<<s1;
 		return s1;}
 void Board::Score(int n){}
 void Pacman::Score(int n){ score+=n;}
 int Board::Radius(){ return 20;}
 int Pacman::Radius(){ return radius;}
 void Board::Reset(int x,int y){}
+void Board::Score_Reset(){}
+void Pacman::Score_Reset(){score=0;}
 void Pacman::Reset(int x,int y){
 	x_cell=13;
 	y_cell=9;
 	x_axis=x_cell*xcellsize;
 	y_axis=y_cell*ycellsize;
-	if(this->pebbles_left==246) score=0;
-	movement=0;
+	movement=1;
 }
 bool Board::Block_left(){
+	return 0;
+}
+bool Board::Block_right(){
+	return 0;
+}
+bool Board::Block_up(){
+return 0;
+}
+bool Board::Block_down(){
+return 0;
+}
+bool Pacman::Block_left(){
 	int x,y;
 		x=ceil(x_cell);
 		y=y_cell;
@@ -141,7 +188,7 @@ bool Board::Block_left(){
 			return 0;
 		return 1;
 }
-bool Board::Block_right(){
+bool Pacman::Block_right(){
 	int x,y;
 	x=floor(x_cell);
 	y=y_cell;
@@ -149,7 +196,7 @@ bool Board::Block_right(){
 		return 0;
 	return 1;
 }
-bool Board::Block_up(){
+bool Pacman::Block_up(){
 	int x,y;
 	x=x_cell;
 	y=floor(y_cell);
@@ -157,7 +204,7 @@ bool Board::Block_up(){
 		return 0;
 	return 1;
 }
-bool Board::Block_down(){
+bool Pacman::Block_down(){
 	int x,y;
 	x=x_cell;
 	y=ceil(y_cell);
@@ -165,7 +212,7 @@ bool Board::Block_down(){
 		return 0;
 	return 1;
 }
-void Board::Search(){
+void Board::Search(int x,int y){
 
 }
 // Destructor
@@ -175,26 +222,27 @@ Board::~Board(void) {}
 Board::Board(int x_i, int y_i) {
 	xcellsize = 20;
 	ycellsize = 20;
-	lwidth = 3; // line width
-	cwidth = 3; // curve widh
-	pcolor = CHOCOLATE;
-	bcolor =  DARK_BLUE;
+	lwidth = 2; // line width
+	cwidth = 2; // curve widh
+	pcolor = SANDY_BROWN;
+	bcolor = NAVY;
 	gcolor = PINK;
 	Mov=0;
 //set up board
 
-	movement  =  1;
+		movement  =  1;
 		x_cell=x_i;
 		y_cell=y_i;
 		x_axis=x_cell*xcellsize; /*280*/
 		y_axis=y_cell*ycellsize;
-		pebbles_left=246;
+		pebbles_left= 246 ;
 }
 Pacman::Pacman(int x_pos, int y_pos):Board(x_pos,y_pos)
 {		radius=16;
 		/*192*/
 		score=0;
 		increment=20;
+		record=0;
 		//pebbles_left=242;
 
 }
@@ -203,39 +251,75 @@ void Board::Movement(){
 }
 void Pacman::Movement(){
 
-	if(movement==1){
+//cout<<"Record = "<<record<<" Movement="<<movement<<endl;
+
+	if(record==1 and movement==3 and this->Block_up()==1){
+		Xmm();
+		record=1;
+	}
+	else if(record==1 and movement==4 and this->Block_down()==1){
+				Xmm();
+				record=1;
+			}
+	else if(record==2 and movement==3 and this->Block_up()==1){
+			Xpp();
+			record=2;
+		}
+	else if(record==2 and movement==4 and this->Block_down()==1){
+				Xpp();
+				record=2;
+			}
+	else if(record==3 and movement==1 and this->Block_left()==1){
+			Ypp();
+			record=3;
+		}
+		else if(record==3 and movement==2 and this->Block_right()==1){
+					Ypp();
+					record=3;
+				}
+		else if(record==4 and movement==1 and this->Block_left()==1){
+				Ymm();
+				record=4;
+			}
+		else if(record==4 and movement==2 and this->Block_right()==1){
+					Ymm();
+					record=4;
+				}
+
+
+
+	else if(movement==1 and this->Block_left()==0){ // Left
 
 			Xmm();
+			record=1;
 			if(this->x_cell==0){
 						x_cell=27;
 						x_axis=20*x_cell;
 						movement=1;
 					}
-			//cout<<"Movement = Left "<<endl;
 			}
-			if(movement==2){
+	else 	if(movement==2 and this->Block_right()==0){  // Right
 			Xpp();
+			record=2;
 			if(this->x_cell==27){
 					x_cell=0;
 					x_axis=20*0;
 					movement=2;
 				}
-			//cout<<"Movement = Right "<<endl;
 			}
-			if(movement==3){
+	else	if(movement==3 and this->Block_up()==0){ // Up
 			Ypp();
-			//cout<<"Movement = Up "<<endl;
+			record=3;
 			}
-			if(movement==4){
+	else   if(movement==4 and this->Block_down()==0){  // Down
 			Ymm();
-			//cout<<"Movement = Down "<<endl;
+			record=4;
 			}
 }
 void Board::Movement2(){ }
-void Board::Draw(void) {
+void Board::Draw(int m) {
 	glColor3f(0, 0, 1);
 	glPushMatrix();
-
 	int offset = xcellsize / 2.0, roffset = 2;
 
 	for (int i = BOARD_X - 1, y = 0; i >= 0; --i, y += xcellsize) {
@@ -333,8 +417,11 @@ void Board::Draw(void) {
 			case VE: // Valid Empty
 				break;
 			case SB: // Solid Ball
-				DrawCircle(x + xcellsize / 2, y + ycellsize / 2, xcellsize / 2,
-						colors[pcolor]);
+				if(m%4==0 or m%4==1)
+				DrawCircle(x + xcellsize / 2, y + ycellsize / 2, xcellsize /2,colors[pcolor]);
+				else if(m%4==2 or m%4==3 )
+					DrawCircle(x + xcellsize / 2, y + ycellsize / 2, xcellsize/3 ,colors[pcolor]);
+
 				break;
 			case SBL: // Staright line with Left corner bottom
 				DrawLine(x, y + xcellsize, x + xcellsize, y + ycellsize, lwidth,
